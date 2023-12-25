@@ -9,9 +9,9 @@ import '../screens/login_screen.dart';
 
 class ProfileSummaryCard extends StatelessWidget {
   const ProfileSummaryCard({
-    super.key,
+    Key? key,
     this.enableOnTap = true,
-  });
+  }) : super(key: key);
 
   final bool enableOnTap;
 
@@ -44,8 +44,10 @@ class ProfileSummaryCard extends StatelessWidget {
       ),
       title: Text(
         fullName,
-        style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+        ),
       ),
       subtitle: Text(
         AuthController.user?.email ?? '',
@@ -54,12 +56,10 @@ class ProfileSummaryCard extends StatelessWidget {
       trailing: IconButton(
         onPressed: () async {
           await AuthController.clearAuthData();
-          // TODO : solve this warning
-          // ignore: use_build_context_synchronously
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const LoginScreen()),
-              (route) => false);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
         },
         icon: const Icon(Icons.logout),
       ),
@@ -68,6 +68,6 @@ class ProfileSummaryCard extends StatelessWidget {
   }
 
   String get fullName {
-    return '${AuthController.user?.firstName ?? ''} ${AuthController.user?.lastName ?? ')'}';
+    return '${AuthController.user?.firstName ?? ''} ${AuthController.user?.lastName ?? ''}';
   }
 }
