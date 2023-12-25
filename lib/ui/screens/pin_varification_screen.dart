@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:task_manager_project/Data/ui/screen/reset_pass_screen.dart';
+import 'package:task_manager_project/ui/screens/reset_pass_screen.dart';
 
 import '../widgets/body_background.dart';
 import 'login_screen.dart';

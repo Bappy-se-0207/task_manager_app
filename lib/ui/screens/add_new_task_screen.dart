@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../netwrok_caller/network_caller.dart';
-import '../../netwrok_caller/netwrok_response.dart';
-import '../../utility/urls.dart';
+import '../../Data/network_caller/network_caller.dart';
+import '../../Data/network_caller/netwrok_response.dart';
+import '../../Data/utility/urls.dart';
 import '../widgets/body_background.dart';
 import '../widgets/profile_summary_card.dart';
 import '../widgets/snack_message.dart';

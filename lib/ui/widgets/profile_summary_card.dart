@@ -4,8 +4,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 import '../controllers/auth_controller.dart';
-import '../screen/edit_task_screen.dart';
-import '../screen/login_screen.dart';
+import '../screens/edit_task_screen.dart';
+import '../screens/login_screen.dart';
 
 class ProfileSummaryCard extends StatelessWidget {
   const ProfileSummaryCard({
@@ -55,6 +55,7 @@ class ProfileSummaryCard extends StatelessWidget {
         onPressed: () async {
           await AuthController.clearAuthData();
           // TODO : solve this warning
+          // ignore: use_build_context_synchronously
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const LoginScreen()),

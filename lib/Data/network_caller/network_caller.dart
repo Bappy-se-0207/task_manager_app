@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 
-import '../ui/app.dart';
-import '../ui/controllers/auth_controller.dart';
-import '../ui/screen/login_screen.dart';
+import '../../app.dart';
+import '../../ui/controllers/auth_controller.dart';
+import '../../ui/screens/login_screen.dart';
 import 'netwrok_response.dart';
 
 class NetworkCaller {

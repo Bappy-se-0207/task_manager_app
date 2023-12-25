@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../netwrok_caller/network_caller.dart';
-import '../../netwrok_caller/netwrok_response.dart';
-import '../../utility/urls.dart';
+import '../../Data/network_caller/network_caller.dart';
+import '../../Data/network_caller/netwrok_response.dart';
+import '../../Data/utility/urls.dart';
 import '../widgets/body_background.dart';
 import '../widgets/snack_message.dart';
 
@@ -53,10 +53,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         hintText: 'Email',
                       ),
                       validator: (String? value) {
-                        // todo - validate the email address with regex
                         if (value?.trim().isEmpty ?? true) {
                           return 'Enter your valid email';
                         }
+                        final RegExp emailRegex = RegExp(
+                            r"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$");
+
+                        if (!emailRegex.hasMatch(value!)) {
+                          return 'Enter a valid email address';
+                        }
+
                         return null;
                       },
                     ),
@@ -100,10 +106,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         hintText: 'Mobile',
                       ),
                       validator: (String? value) {
-                        // todo - validate the mobile no with 11 digits
                         if (value?.trim().isEmpty ?? true) {
-                          return 'Enter your mobile';
+                          return 'Enter your mobile number';
                         }
+                        if (value!.trim().length != 11) {
+                          return 'Mobile number must be 11 digits long';
+                        }
+
                         return null;
                       },
                     ),
@@ -118,7 +127,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       validator: (String? value) {
                         if (value?.isEmpty ?? true) {
-                          return 'Enter your mobile';
+                          return 'Enter your password';
                         }
                         if (value!.length < 6) {
                           return 'Enter password more than 6 letters';

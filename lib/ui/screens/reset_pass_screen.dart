@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager_project/Data/ui/screen/pin_varification_screen.dart';
+import 'package:task_manager_project/ui/screens/pin_varification_screen.dart';
 
 import '../widgets/body_background.dart';
+import 'login_screen.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({super.key});
+class ResetPasswordScreen extends StatefulWidget {
+  const ResetPasswordScreen({super.key});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,14 +27,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     height: 80,
                   ),
                   Text(
-                    'Your Email Address',
+                    'Set Password',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(
                     height: 8,
                   ),
                   const Text(
-                    'A 6 digit OTP will be sent to your email address',
+                    'Minimum password length should be more than 8 letters',
                     style: TextStyle(
                         color: Colors.grey, fontWeight: FontWeight.w600),
                   ),
@@ -41,9 +42,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     height: 24,
                   ),
                   TextFormField(
-                    keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
-                      hintText: 'Email',
+                      hintText: 'Password',
+                    ),
+                  ),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      hintText: 'Confirm Password',
                     ),
                   ),
                   const SizedBox(
@@ -60,7 +65,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           ),
                         );
                       },
-                      child: const Icon(Icons.arrow_circle_right_outlined),
+                      child: const Text('Confirm'),
                     ),
                   ),
                   const SizedBox(
@@ -78,7 +83,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginScreen()),
+                              (route) => false);
                         },
                         child: const Text(
                           'Sign In',

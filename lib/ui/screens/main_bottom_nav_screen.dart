@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager_project/Data/ui/screen/progress_tasks_screen.dart';
+import 'package:task_manager_project/ui/screens/progress_tasks_screen.dart';
 
 import 'cancelled_task_screen.dart';
 import 'completed_task_screen.dart';

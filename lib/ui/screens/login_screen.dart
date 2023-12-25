@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager_project/Data/ui/screen/sign_up_screen.dart';
+import 'package:task_manager_project/ui/screens/sign_up_screen.dart';
 
-import '../../Models/user_model.dart';
-import '../../netwrok_caller/network_caller.dart';
-import '../../netwrok_caller/netwrok_response.dart';
-import '../../utility/urls.dart';
+import '../../Data/Models/user_model.dart';
+import '../../Data/network_caller/network_caller.dart';
+import '../../Data/network_caller/netwrok_response.dart';
+import '../../Data/utility/urls.dart';
 import '../controllers/auth_controller.dart';
 import '../widgets/body_background.dart';
 import '../widgets/snack_message.dart';

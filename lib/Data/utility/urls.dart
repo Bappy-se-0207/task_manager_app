@@ -1,4 +1,4 @@
-import '../ui/widgets/task_item_card.dart';
+import '../../ui/widgets/task_item_card.dart';
 
 class Urls {
   static const String _baseUrl = 'https://task.teamrabbil.com/api/v1';

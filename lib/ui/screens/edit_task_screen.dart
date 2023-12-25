@@ -1,11 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
-import '../../Models/user_model.dart';
-import '../../netwrok_caller/network_caller.dart';
-import '../../netwrok_caller/netwrok_response.dart';
-import '../../utility/urls.dart';
+import '../../Data/Models/user_model.dart';
+import '../../Data/network_caller/network_caller.dart';
+import '../../Data/network_caller/netwrok_response.dart';
+import '../../Data/utility/urls.dart';
 import '../controllers/auth_controller.dart';
 import '../widgets/body_background.dart';
 import '../widgets/profile_summary_card.dart';
@@ -40,7 +41,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Add form validation
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -73,6 +73,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         TextFormField(
                           controller: _emailTEController,
                           decoration: const InputDecoration(hintText: 'Email'),
+                          validator: (String? value) {
+                            if (value?.trim().isEmpty ?? true) {
+                              return 'Enter your email';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(
                           height: 8,
@@ -81,6 +87,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           controller: _firstNameTEController,
                           decoration:
                               const InputDecoration(hintText: 'First name'),
+                          validator: (String? value) {
+                            if (value?.trim().isEmpty ?? true) {
+                              return 'Enter your first name';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(
                           height: 8,
@@ -89,6 +101,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           controller: _lastNameTEController,
                           decoration:
                               const InputDecoration(hintText: 'Last name'),
+                          validator: (String? value) {
+                            if (value?.trim().isEmpty ?? true) {
+                              return 'Enter your last name';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(
                           height: 8,
@@ -96,6 +114,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         TextFormField(
                           controller: _mobileTEController,
                           decoration: const InputDecoration(hintText: 'Mobile'),
+                          validator: (String? value) {
+                            if (value?.trim().isEmpty ?? true) {
+                              return 'Enter your mobile number';
+                            }
+                            if (value!.trim().length != 11) {
+                              return 'Mobile number must be 11 digits long';
+                            }
+
+                            return null;
+                          },
                         ),
                         const SizedBox(
                           height: 8,
@@ -104,6 +132,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           controller: _passwordTEController,
                           decoration: const InputDecoration(
                               hintText: 'Password (optional)'),
+                          validator: (String? value) {
+                            if (value?.isEmpty ?? true) {
+                              return 'Enter your password';
+                            }
+                            if (value!.length < 6) {
+                              return 'Enter password more than 6 letters';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(
                           height: 16,

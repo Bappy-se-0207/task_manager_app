@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../Models/task_list_model.dart';
-import '../../netwrok_caller/network_caller.dart';
-import '../../netwrok_caller/netwrok_response.dart';
-import '../../utility/urls.dart';
+import '../../Data/Models/task_list_model.dart';
+import '../../Data/network_caller/network_caller.dart';
+import '../../Data/network_caller/netwrok_response.dart';
+import '../../Data/utility/urls.dart';
 import '../widgets/profile_summary_card.dart';
 import '../widgets/task_item_card.dart';
 
