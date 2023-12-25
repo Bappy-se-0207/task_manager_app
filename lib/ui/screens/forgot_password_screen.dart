@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager_project/ui/screens/pin_varification_screen.dart';
+import 'package:get/get.dart';
+import 'package:task_manager_project/ui/screens/pin_verification_screen.dart';
 
 import '../widgets/body_background.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({super.key});
+class ForgotPasswordScreen extends StatelessWidget {
+  const ForgotPasswordScreen({Key? key}) : super(key: key);
 
-  @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
-}
+  final TextEditingController emailController = TextEditingController();
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +25,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   Text(
                     'Your Email Address',
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: Theme.of(context).textTheme.headline6,
                   ),
                   const SizedBox(
                     height: 8,
@@ -35,12 +33,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   const Text(
                     'A 6 digit OTP will be sent to your email address',
                     style: TextStyle(
-                        color: Colors.grey, fontWeight: FontWeight.w600),
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(
                     height: 24,
                   ),
                   TextFormField(
+                    controller: emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
                       hintText: 'Email',
@@ -53,12 +54,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const PinVerificationScreen(),
-                          ),
-                        );
+                        // Use Get.to to navigate to the PinVerificationScreen
+                        Get.to(() => const PinVerificationScreen());
                       },
                       child: const Icon(Icons.arrow_circle_right_outlined),
                     ),
@@ -72,13 +69,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       const Text(
                         "Have an account?",
                         style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black54),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black54,
+                        ),
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.pop(context);
+                          // Use Get.back to navigate back
+                          Get.back();
                         },
                         child: const Text(
                           'Sign In',

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:task_manager_project/ui/screens/sign_up_screen.dart';
-
 import '../../Data/Models/user_model.dart';
 import '../../Data/network_caller/network_caller.dart';
 import '../../Data/network_caller/netwrok_response.dart';
@@ -11,18 +11,10 @@ import '../widgets/snack_message.dart';
 import 'forgot_password_screen.dart';
 import 'main_bottom_nav_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
-
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreen extends GetWidget<AuthController> {
   final TextEditingController _emailTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _loginInProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -81,13 +73,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(
                       width: double.infinity,
-                      child: Visibility(
-                        visible: _loginInProgress == false,
-                        replacement: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                        child: ElevatedButton(
-                          onPressed: login,
+                      child: Obx(
+                            () => ElevatedButton(
+                          onPressed: controller.loginInProgress.value
+                              ? null
+                              : () => login(),
                           child: const Icon(Icons.arrow_circle_right_outlined),
                         ),
                       ),
@@ -98,13 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Center(
                       child: TextButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const ForgotPasswordScreen(),
-                            ),
-                          );
+                          Get.to(() => const ForgotPasswordScreen());
                         },
                         child: const Text(
                           'Forgot Password?',
@@ -124,12 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SignUpScreen(),
-                              ),
-                            );
+                            Get.to(() => const SignUpScreen());
                           },
                           child: const Text(
                             'Sign Up',
@@ -152,38 +131,28 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    _loginInProgress = true;
-    if (mounted) {
-      setState(() {});
-    }
+    controller.setLoginInProgress(true);
+
     NetworkResponse response = await NetworkCaller().postRequest(Urls.login,
         body: {
           'email': _emailTEController.text.trim(),
           'password': _passwordTEController.text,
         },
         isLogin: true);
-    _loginInProgress = false;
-    if (mounted) {
-      setState(() {});
-    }
+
+    controller.setLoginInProgress(false);
+
     if (response.isSuccess) {
-      await AuthController.saveUserInformation(response.jsonResponse['token'],
-          UserModel.fromJson(response.jsonResponse['data']));
-      if (mounted) {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const MainBottomNavScreen()));
-      }
+      await AuthController.saveUserInformation(
+        response.jsonResponse['token'],
+        UserModel.fromJson(response.jsonResponse['data']),
+      );
+      Get.offAll(() => const MainBottomNavScreen());
     } else {
       if (response.statusCode == 401) {
-        if (mounted) {
-          showSnackMessage(context, 'Please check email/password');
-        }
+        showSnackMessage('Please check email/password');
       } else {
-        if (mounted) {
-          showSnackMessage(context, 'Login failed. Try again');
-        }
+        showSnackMessage('Login failed. Try again');
       }
     }
   }

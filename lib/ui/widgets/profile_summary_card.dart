@@ -2,50 +2,45 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart'; // Import the GetX package
 import '../controllers/auth_controller.dart';
 import '../screens/edit_task_screen.dart';
 import '../screens/login_screen.dart';
 
 class ProfileSummaryCard extends StatelessWidget {
   const ProfileSummaryCard({
-    super.key,
+    Key? key, // Fix the key parameter here
     this.enableOnTap = true,
-  });
+  }) : super(key: key);
 
   final bool enableOnTap;
 
   @override
   Widget build(BuildContext context) {
     Uint8List imageBytes =
-        const Base64Decoder().convert(AuthController.user?.photo ?? '');
+    const Base64Decoder().convert(AuthController.user?.photo ?? '');
 
     return ListTile(
       onTap: () {
         if (enableOnTap) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const EditProfileScreen(),
-            ),
-          );
+          Get.to(const EditProfileScreen()); // Use Get.to for navigation
         }
       },
       leading: CircleAvatar(
         child: AuthController.user?.photo == null
             ? const Icon(Icons.person)
             : ClipRRect(
-                borderRadius: BorderRadius.circular(30),
-                child: Image.memory(
-                  imageBytes,
-                  fit: BoxFit.cover,
-                ),
-              ),
+          borderRadius: BorderRadius.circular(30),
+          child: Image.memory(
+            imageBytes,
+            fit: BoxFit.cover,
+          ),
+        ),
       ),
       title: Text(
         fullName,
         style:
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
       ),
       subtitle: Text(
         AuthController.user?.email ?? '',
@@ -54,12 +49,7 @@ class ProfileSummaryCard extends StatelessWidget {
       trailing: IconButton(
         onPressed: () async {
           await AuthController.clearAuthData();
-          // TODO : solve this warning
-          // ignore: use_build_context_synchronously
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const LoginScreen()),
-              (route) => false);
+          Get.offAll(const LoginScreen()); // Use Get.offAll for replacing the route
         },
         icon: const Icon(Icons.logout),
       ),
@@ -68,6 +58,6 @@ class ProfileSummaryCard extends StatelessWidget {
   }
 
   String get fullName {
-    return '${AuthController.user?.firstName ?? ''} ${AuthController.user?.lastName ?? ')'}';
+    return '${AuthController.user?.firstName ?? ''} ${AuthController.user?.lastName ?? ''}';
   }
 }

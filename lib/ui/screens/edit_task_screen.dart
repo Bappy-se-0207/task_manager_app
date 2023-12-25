@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../Data/Models/user_model.dart';
@@ -12,35 +13,20 @@ import '../widgets/body_background.dart';
 import '../widgets/profile_summary_card.dart';
 import '../widgets/snack_message.dart';
 
-class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
-
-  @override
-  State<EditProfileScreen> createState() => _EditProfileScreenState();
-}
-
-class _EditProfileScreenState extends State<EditProfileScreen> {
+class EditProfileScreen extends StatelessWidget {
   final TextEditingController _emailTEController = TextEditingController();
   final TextEditingController _firstNameTEController = TextEditingController();
   final TextEditingController _lastNameTEController = TextEditingController();
   final TextEditingController _mobileTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
 
-  bool _updateProfileInProgress = false;
-
-  XFile? photo;
-
-  @override
-  void initState() {
-    super.initState();
-    _emailTEController.text = AuthController.user?.email ?? '';
-    _firstNameTEController.text = AuthController.user?.firstName ?? '';
-    _lastNameTEController.text = AuthController.user?.lastName ?? '';
-    _mobileTEController.text = AuthController.user?.mobile ?? '';
-  }
+  final RxBool _updateProfileInProgress = false.obs;
+  final Rx<XFile?> photo = Rx<XFile?>(null);
 
   @override
   Widget build(BuildContext context) {
+    _initializeControllers();
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -66,15 +52,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         const SizedBox(
                           height: 16,
                         ),
-                        photoPickerField(),
+                        _photoPickerField(),
                         const SizedBox(
                           height: 8,
                         ),
-                        TextFormField(
+                        _buildTextFormField(
                           controller: _emailTEController,
-                          decoration: const InputDecoration(hintText: 'Email'),
-                          validator: (String? value) {
-                            if (value?.trim().isEmpty ?? true) {
+                          hintText: 'Email',
+                          validator: (value) {
+                            if (value.trim().isEmpty) {
                               return 'Enter your email';
                             }
                             return null;
@@ -83,12 +69,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         const SizedBox(
                           height: 8,
                         ),
-                        TextFormField(
+                        _buildTextFormField(
                           controller: _firstNameTEController,
-                          decoration:
-                              const InputDecoration(hintText: 'First name'),
-                          validator: (String? value) {
-                            if (value?.trim().isEmpty ?? true) {
+                          hintText: 'First name',
+                          validator: (value) {
+                            if (value.trim().isEmpty) {
                               return 'Enter your first name';
                             }
                             return null;
@@ -97,12 +82,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         const SizedBox(
                           height: 8,
                         ),
-                        TextFormField(
+                        _buildTextFormField(
                           controller: _lastNameTEController,
-                          decoration:
-                              const InputDecoration(hintText: 'Last name'),
-                          validator: (String? value) {
-                            if (value?.trim().isEmpty ?? true) {
+                          hintText: 'Last name',
+                          validator: (value) {
+                            if (value.trim().isEmpty) {
                               return 'Enter your last name';
                             }
                             return null;
@@ -111,32 +95,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         const SizedBox(
                           height: 8,
                         ),
-                        TextFormField(
+                        _buildTextFormField(
                           controller: _mobileTEController,
-                          decoration: const InputDecoration(hintText: 'Mobile'),
-                          validator: (String? value) {
-                            if (value?.trim().isEmpty ?? true) {
+                          hintText: 'Mobile',
+                          validator: (value) {
+                            if (value.trim().isEmpty) {
                               return 'Enter your mobile number';
                             }
-                            if (value!.trim().length != 11) {
+                            if (value.trim().length != 11) {
                               return 'Mobile number must be 11 digits long';
                             }
-
                             return null;
                           },
                         ),
                         const SizedBox(
                           height: 8,
                         ),
-                        TextFormField(
+                        _buildTextFormField(
                           controller: _passwordTEController,
-                          decoration: const InputDecoration(
-                              hintText: 'Password (optional)'),
-                          validator: (String? value) {
-                            if (value?.isEmpty ?? true) {
+                          hintText: 'Password (optional)',
+                          validator: (value) {
+                            if (value.isEmpty) {
                               return 'Enter your password';
                             }
-                            if (value!.length < 6) {
+                            if (value.length < 6) {
                               return 'Enter password more than 6 letters';
                             }
                             return null;
@@ -147,35 +129,52 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                         SizedBox(
                           width: double.infinity,
-                          child: Visibility(
-                            visible: _updateProfileInProgress == false,
-                            replacement: const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                            child: ElevatedButton(
-                              onPressed: updateProfile,
-                              child:
-                                  const Icon(Icons.arrow_circle_right_outlined),
+                          child: Obx(
+                                () => Visibility(
+                              visible: !_updateProfileInProgress.value,
+                              replacement: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                              child: ElevatedButton(
+                                onPressed: _updateProfile,
+                                child: const Icon(Icons.arrow_circle_right_outlined),
+                              ),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 
-  Future<void> updateProfile() async {
-    _updateProfileInProgress = true;
-    if (mounted) {
-      setState(() {});
-    }
+  void _initializeControllers() {
+    _emailTEController.text = AuthController.user?.email ?? '';
+    _firstNameTEController.text = AuthController.user?.firstName ?? '';
+    _lastNameTEController.text = AuthController.user?.lastName ?? '';
+    _mobileTEController.text = AuthController.user?.mobile ?? '';
+  }
+
+  Widget _buildTextFormField({
+    required TextEditingController controller,
+    required String hintText,
+    required FormFieldValidator<String>? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(hintText: hintText),
+      validator: validator,
+    );
+  }
+
+  Future<void> _updateProfile() async {
+    _updateProfileInProgress.value = true;
     String? photoInBase64;
     Map<String, dynamic> inputData = {
       "firstName": _firstNameTEController.text.trim(),
@@ -188,8 +187,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       inputData['password'] = _passwordTEController.text;
     }
 
-    if (photo != null) {
-      List<int> imageBytes = await photo!.readAsBytes();
+    if (photo.value != null) {
+      List<int> imageBytes = await photo.value!.readAsBytes();
       photoInBase64 = base64Encode(imageBytes);
       inputData['photo'] = photoInBase64;
     }
@@ -198,32 +197,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       Urls.updateProfile,
       body: inputData,
     );
-    _updateProfileInProgress = false;
-    if (mounted) {
-      setState(() {});
-    }
+    _updateProfileInProgress.value = false;
+
     if (response.isSuccess) {
       AuthController.updateUserInformation(UserModel(
-          email: _emailTEController.text.trim(),
-          firstName: _firstNameTEController.text.trim(),
-          lastName: _lastNameTEController.text.trim(),
-          mobile: _mobileTEController.text.trim(),
-          photo: photoInBase64 ?? AuthController.user?.photo));
-      if (mounted) {
-        showSnackMessage(context, 'Update profile success!');
-      }
+        email: _emailTEController.text.trim(),
+        firstName: _firstNameTEController.text.trim(),
+        lastName: _lastNameTEController.text.trim(),
+        mobile: _mobileTEController.text.trim(),
+        photo: photoInBase64 ?? AuthController.user?.photo,
+      ));
+      showSnackMessage(context, 'Update profile success!');
     } else {
-      if (mounted) {
-        showSnackMessage(context, 'Update profile failed. Try again.');
-      }
+      showSnackMessage(context, 'Update profile failed. Try again.');
     }
   }
 
-  Container photoPickerField() {
+  Widget _photoPickerField() {
     return Container(
       height: 50,
       decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(8)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: Row(
         children: [
           Expanded(
@@ -231,11 +227,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Container(
               height: 50,
               decoration: const BoxDecoration(
-                  color: Colors.grey,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(8),
-                    bottomLeft: Radius.circular(8),
-                  )),
+                color: Colors.grey,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  bottomLeft: Radius.circular(8),
+                ),
+              ),
               alignment: Alignment.center,
               child: const Text(
                 'Photo',
@@ -247,21 +244,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             flex: 3,
             child: InkWell(
               onTap: () async {
-                final XFile? image = await ImagePicker()
-                    .pickImage(source: ImageSource.camera, imageQuality: 50);
+                final XFile? image = await ImagePicker().pickImage(
+                  source: ImageSource.camera,
+                  imageQuality: 50,
+                );
                 if (image != null) {
-                  photo = image;
-                  if (mounted) {
-                    setState(() {});
-                  }
+                  photo.value = image;
                 }
               },
               child: Container(
                 padding: const EdgeInsets.only(left: 16),
-                child: Visibility(
-                  visible: photo == null,
-                  replacement: Text(photo?.name ?? ''),
-                  child: const Text('Select a photo'),
+                child: Obx(
+                      () => Visibility(
+                    visible: photo.value == null,
+                    replacement: Text(photo.value?.name ?? ''),
+                    child: const Text('Select a photo'),
+                  ),
                 ),
               ),
             ),

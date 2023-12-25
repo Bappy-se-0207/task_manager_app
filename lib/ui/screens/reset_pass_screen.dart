@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:task_manager_project/ui/screens/pin_varification_screen.dart';
 
 import '../widgets/body_background.dart';
 import 'login_screen.dart';
 
-class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
+class ResetPasswordScreen extends StatelessWidget {
+  const ResetPasswordScreen({Key? key}) : super(key: key);
 
-  @override
-  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
-}
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
 
-class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
+  void _confirmButtonPressed() {
+    // Add your logic for handling password confirmation here
+    // For example, you can check if passwords match and meet the required criteria
+    Get.to(const PinVerificationScreen());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +33,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   ),
                   Text(
                     'Set Password',
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: Theme.of(context).textTheme.headline4,
                   ),
                   const SizedBox(
                     height: 8,
@@ -36,17 +41,21 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   const Text(
                     'Minimum password length should be more than 8 letters',
                     style: TextStyle(
-                        color: Colors.grey, fontWeight: FontWeight.w600),
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(
                     height: 24,
                   ),
                   TextFormField(
+                    controller: passwordController,
                     decoration: const InputDecoration(
                       hintText: 'Password',
                     ),
                   ),
                   TextFormField(
+                    controller: confirmPasswordController,
                     decoration: const InputDecoration(
                       hintText: 'Confirm Password',
                     ),
@@ -57,14 +66,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const PinVerificationScreen(),
-                          ),
-                        );
-                      },
+                      onPressed: _confirmButtonPressed,
                       child: const Text('Confirm'),
                     ),
                   ),
@@ -75,19 +77,16 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        "Have an account?",
+                        'Have an account?',
                         style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black54),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black54,
+                        ),
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginScreen()),
-                              (route) => false);
+                          Get.offAll(() => const LoginScreen());
                         },
                         child: const Text(
                           'Sign In',

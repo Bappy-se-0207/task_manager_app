@@ -1,18 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:task_manager_project/ui/screens/reset_pass_screen.dart';
 
 import '../widgets/body_background.dart';
 import 'login_screen.dart';
 
-class PinVerificationScreen extends StatefulWidget {
-  const PinVerificationScreen({super.key});
+class PinVerificationController extends GetxController {
+  final RxString pin = ''.obs;
 
-  @override
-  State<PinVerificationScreen> createState() => _PinVerificationScreenState();
+  void onPinChanged(String value) {
+    pin.value = value;
+  }
+
+  void onPinCompleted(String value) {
+    print("Completed");
+    // You can add additional logic here when pin is completed
+  }
+
+  void verifyPin() {
+    Get.to(() => const ResetPasswordScreen());
+  }
 }
 
-class _PinVerificationScreenState extends State<PinVerificationScreen> {
+class PinVerificationScreen extends StatelessWidget {
+  final PinVerificationController controller = Get.put(PinVerificationController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +55,7 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
                   const SizedBox(
                     height: 24,
                   ),
-                  PinCodeTextField(
+                  Obx(() => PinCodeTextField(
                     length: 6,
                     obscureText: false,
                     animationType: AnimationType.fade,
@@ -58,29 +71,20 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
                     ),
                     animationDuration: const Duration(milliseconds: 300),
                     enableActiveFill: true,
-                    onCompleted: (v) {
-                      print("Completed");
-                    },
-                    onChanged: (value) {},
+                    onCompleted: controller.onPinCompleted,
+                    onChanged: controller.onPinChanged,
                     beforeTextPaste: (text) {
                       return true;
                     },
                     appContext: context,
-                  ),
+                  )),
                   const SizedBox(
                     height: 16,
                   ),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ResetPasswordScreen(),
-                          ),
-                        );
-                      },
+                      onPressed: controller.verifyPin,
                       child: const Text('Verify'),
                     ),
                   ),
@@ -99,11 +103,7 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginScreen()),
-                              (route) => false);
+                          Get.offAll(() => const LoginScreen());
                         },
                         child: const Text(
                           'Sign In',

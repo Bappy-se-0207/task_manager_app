@@ -1,35 +1,38 @@
 import 'dart:convert';
 
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Data/Models/user_model.dart';
 
-class AuthController {
-  static String? token;
-  static UserModel? user;
+class AuthController extends GetxController {
+  static AuthController get to => Get.find();
 
-  static Future<void> saveUserInformation(String t, UserModel model) async {
+  RxString? token = ''.obs;
+  Rx<UserModel?> user = Rx<UserModel?>(null);
+
+  Future<void> saveUserInformation(String t, UserModel model) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.setString('token', t);
     await sharedPreferences.setString('user', jsonEncode(model.toJson()));
-    token = t;
-    user = model;
+    token = t.obs;
+    user.value = model;
   }
 
-  static Future<void> updateUserInformation(UserModel model) async {
+  Future<void> updateUserInformation(UserModel model) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.setString('user', jsonEncode(model.toJson()));
-    user = model;
+    user.value = model;
   }
 
-  static Future<void> initializeUserCache() async {
+  Future<void> initializeUserCache() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    token = sharedPreferences.getString('token');
-    user = UserModel.fromJson(
+    token = sharedPreferences.getString('token')?.obs;
+    user.value = UserModel.fromJson(
         jsonDecode(sharedPreferences.getString('user') ?? '{}'));
   }
 
-  static Future<bool> checkAuthState() async {
+  Future<bool> checkAuthState() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     if (sharedPreferences.containsKey('token')) {
       await initializeUserCache();
@@ -38,9 +41,10 @@ class AuthController {
     return false;
   }
 
-  static Future<void> clearAuthData() async {
+  Future<void> clearAuthData() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.clear();
-    token = null;
+    token = ''.obs;
+    user.value = null;
   }
 }

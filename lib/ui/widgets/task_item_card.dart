@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../Data/Models/task.dart';
 import '../../Data/network_caller/network_caller.dart';
@@ -11,32 +12,29 @@ enum TaskStatus {
   Cancelled,
 }
 
-class TaskItemCard extends StatefulWidget {
-  const TaskItemCard({
-    super.key,
-    required this.task,
-    required this.onStatusChange,
-    required this.showProgress,
-  });
+class TaskController extends GetxController {
+  final showProgress = false.obs;
 
-  final Task task;
-  final VoidCallback onStatusChange;
-  final Function(bool) showProgress;
-
-  @override
-  State<TaskItemCard> createState() => _TaskItemCardState();
+  Future<void> updateTaskStatus(Task task, String status) async {
+    showProgress.value = true;
+    final response = await NetworkCaller()
+        .getRequest(Urls.updateTaskStatus(task.sId ?? '', status));
+    if (response.isSuccess) {
+      // Assuming you have a function to update the task status
+      // You can call that function here
+    }
+    showProgress.value = false;
+  }
 }
 
-class _TaskItemCardState extends State<TaskItemCard> {
-  Future<void> updateTaskStatus(String status) async {
-    widget.showProgress(true);
-    final response = await NetworkCaller()
-        .getRequest(Urls.updateTaskStatus(widget.task.sId ?? '', status));
-    if (response.isSuccess) {
-      widget.onStatusChange();
-    }
-    widget.showProgress(false);
-  }
+class TaskItemCard extends StatelessWidget {
+  final Task task;
+  final TaskController taskController = Get.find();
+
+  TaskItemCard({
+    Key? key,
+    required this.task,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -48,33 +46,35 @@ class _TaskItemCardState extends State<TaskItemCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.task.title ?? '',
+              task.title ?? '',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
             ),
-            Text(widget.task.description ?? ''),
-            Text('Date : ${widget.task.createdDate}'),
+            Text(task.description ?? ''),
+            Text('Date : ${task.createdDate}'),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Chip(
                   label: Text(
-                    widget.task.status ?? 'New',
+                    task.status ?? 'New',
                     style: const TextStyle(color: Colors.white),
                   ),
                   backgroundColor: Colors.blue,
                 ),
                 Wrap(
                   children: [
-                    // IconButton(
-                    //     onPressed: () {
-                    //
-                    //     },
-                    //     icon: const Icon(Icons.delete_forever_outlined)),
                     IconButton(
-                        onPressed: () {
-                          showUpdateStatusModal();
-                        },
-                        icon: const Icon(Icons.edit)),
+                      onPressed: () {
+                        // Handle delete logic here
+                      },
+                      icon: const Icon(Icons.delete_forever_outlined),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        taskController.updateTaskStatus(task, showUpdateStatusModal);
+                      },
+                      icon: const Icon(Icons.edit),
+                    ),
                   ],
                 )
               ],
@@ -88,41 +88,33 @@ class _TaskItemCardState extends State<TaskItemCard> {
   void showUpdateStatusModal() {
     List<ListTile> items = TaskStatus.values
         .map((e) => ListTile(
-              title: Text(e.name),
-              onTap: () {
-                updateTaskStatus(e.name);
-                Navigator.pop(context);
-              },
-            ))
+      title: Text(e.toString().split('.').last),
+      onTap: () {
+        taskController.updateTaskStatus(task, e.toString().split('.').last);
+        Get.back();
+      },
+    ))
         .toList();
 
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Update status'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: items,
+    Get.defaultDialog(
+      title: 'Update status',
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: items,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Get.back();
+          },
+          child: const Text(
+            'Cancel',
+            style: TextStyle(
+              color: Colors.blueGrey,
             ),
-            actions: [
-              ButtonBar(
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text(
-                      'Cancel',
-                      style: TextStyle(
-                        color: Colors.blueGrey,
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            ],
-          );
-        });
+          ),
+        ),
+      ],
+    );
   }
 }
